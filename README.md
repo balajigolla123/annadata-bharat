@@ -4,13 +4,15 @@ A web-based agriculture tool that provides **crop-specific fertilizer recommenda
 
 ---
 
+## 🌐 Live Demo
+
+👉 **Open the website:** [https://annadatabharat.netlify.app](https://annadatabharat.netlify.app)
+
+---
+
 ## 🚀 Project Overview
 
 The **Smart Fertilizer & Irrigation Calculator** helps farmers and agricultural users make better decisions by generating:
-
-**Writing**
-
-**New!Click to edit**
 
 * 🌱 Fertilizer recommendations (NPK-based)
 * 💧 Irrigation schedules
@@ -18,7 +20,7 @@ The **Smart Fertilizer & Irrigation Calculator** helps farmers and agricultural 
 * 📊 Visual reports (charts + tables)
 * 📄 Downloadable PDF reports
 
-All recommendations follow **ICAR (Indian Council of Agricultural Research) guidelines** for accuracy and reliability .
+All recommendations follow **ICAR (Indian Council of Agricultural Research) guidelines** for accuracy and reliability.
 
 ---
 
@@ -29,13 +31,13 @@ All recommendations follow **ICAR (Indian Council of Agricultural Research) guid
 * OTP-based login & registration
 * LocalStorage-based user management
 * Session handling with auto-login protection
-* Multi-language support (English, Hindi, Telugu, etc.) 
+* Multi-language support (English, Hindi, Telugu, etc.)
 
 ---
 
 ### 🌾 Smart Calculator
 
-* Supports **50+ crops** (rice, wheat, maize, fruits, vegetables, etc.) 
+* Supports **50+ crops** (rice, wheat, maize, fruits, vegetables, etc.)
 * Input parameters:
 
   * Crop type
@@ -51,7 +53,7 @@ All recommendations follow **ICAR (Indian Council of Agricultural Research) guid
 * NPK values aligned with ICAR standards
 * Soil-based adjustments (low/medium/high fertility)
 * Micro-nutrient deficiency detection (Zn, Fe, B, Cu)
-* Expected yield targets included 
+* Expected yield targets included
 
 ---
 
@@ -64,14 +66,14 @@ All recommendations follow **ICAR (Indian Council of Agricultural Research) guid
   * Fertilizer schedule
   * Irrigation plan
   * Nutrient charts
-  * Compliance notes 
+  * Compliance notes
 
 ---
 
 ### 🌐 Additional Pages
 
 * 🔑 Login Page (OTP authentication)
-* 📞 Contact Page with project details 
+* 📞 Contact Page with project details
 * 📊 Results Page with charts and export options
 
 ---
@@ -143,7 +145,7 @@ No backend required (fully frontend-based).
 
   * Browser alert
   * Console log
-* Use OTP to login and test calculator features 
+* Use OTP to login and test calculator features
 
 ---
 
@@ -175,7 +177,7 @@ Feel free to fork this repository and submit pull requests.
 
 * 📞 Phone: 9381039799
 * 📩 Email: [balajigolla330@gmail.com](mailto:balajigolla330@gmail.com)
-* 📍 Location: Lovely Professional University, Punjab 
+* 📍 Location: Lovely Professional University, Punjab
 
 ---
 
