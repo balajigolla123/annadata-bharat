@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Smart Fertilizer & Irrigation Calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/login.css">
+  <style>
+    body.login-body {
+      background: linear-gradient(120deg, #e8f5e9 0%, #fffde7 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .login-container {
+      max-width: 400px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
+      padding: 32px 28px 24px 28px;
+    }
+    .login-title {
+      text-align: center;
+      font-size: 2rem;
+      color: #388e3c;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .login-subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 24px;
+    }
+    .form-section {
+      margin-bottom: 18px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      font-weight: 500;
+      color: #333;
+      display: block;
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="tel"], input[type="password"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #cfd8dc;
+      font-size: 1rem;
+      background: #f9fbe7;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: #388e3c;
+      outline: none;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #388e3c;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .login-btn:hover {
+      background: #2e7d32;
+    }
+    .btn-secondary {
+      background: #cfd8dc;
+      color: #333;
+      margin-top: 0;
+    }
+    .switch-link {
+      color: #388e3c;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.98rem;
+    }
+    .otp-info {
+      text-align: center;
+      color: #388e3c;
+      margin-bottom: 10px;
+    }
+    .language-select {
+      float: right;
+      margin-bottom: 18px;
+      border-radius: 6px;
+      padding: 6px 12px;
+      border: 1px solid #cfd8dc;
+      background: #f9fbe7;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body class="login-body">
+  
+  <div class="login-container">
+    <div style="text-align:center;margin-bottom:10px;">
+      <img src="assets/logo.png" alt="Annadata Bharat logo" class="app-logo" style="margin:0 auto;">
+    </div>
+    <select id="languageSelect" class="language-select" aria-label="Select language">
+      <option value="en">English</option>
+      <option value="hi">Hindi</option>
+      <option value="bn">Bengali</option>
+      <option value="te">Telugu</option>
+      <option value="mr">Marathi</option>
+      <option value="ta">Tamil</option>
+      <option value="ur">Urdu</option>
+      <option value="gu">Gujarati</option>
+      <option value="kn">Kannada</option>
+      <option value="ml">Malayalam</option>
+      <option value="or">Odia</option>
+      <option value="pa">Punjabi</option>
+    </select>
+    <h1 class="login-title" data-i18n="main_title">🌾 Agriculture Calculator</h1>
+    <p class="login-subtitle" data-i18n="main_subtitle">Smart Fertilizer & Irrigation Recommendation System</p>
+    <div class="login-horizontal-forms">
+      <!-- Create Account Form -->
+      <div id="loginForm" class="form-section">
+        <form id="authForm" onsubmit="handlePhoneSubmit(event)">
+          <div class="form-group">
+            <span data-i18n="label_full_name" style="color:#388e3c;font-weight:600;display:block;margin-bottom:2px;">Full Name</span>
+            <label for="userName" data-i18n="label_full_name" style="display:none;">Full Name <span style="color:red">*</span></label>
+            <input type="text" id="userName" data-i18n-placeholder="placeholder_full_name" placeholder="Enter your full name" required>
+          </div>
+          <div class="form-group">
+            <span data-i18n="label_mobile" style="color:#388e3c;font-weight:600;display:block;margin-bottom:2px;">Mobile Number</span>
+            <label for="userPhone" data-i18n="label_mobile" style="display:none;">Mobile Number <span style="color:red">*</span></label>
+            <div class="phone-input-group" style="display:flex;align-items:center;gap:6px;">
+              <span class="country-code">+91</span>
+              <input type="tel" id="userPhone" data-i18n-placeholder="placeholder_mobile" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <span data-i18n="label_pincode" style="color:#388e3c;font-weight:600;display:block;margin-bottom:2px;">Pincode</span>
+            <label for="userPincode" data-i18n="label_pincode" style="display:none;">Pincode <span style="color:red">*</span></label>
+            <input type="text" id="userPincode" data-i18n-placeholder="placeholder_pincode" placeholder="6-digit pincode" maxlength="6" pattern="[0-9]{6}" required>
+          </div>
+          <button type="submit" class="login-btn" data-i18n="login_send_otp">Send OTP</button>
+        </form>
+        <div style="text-align:center;margin-top:10px;">
+          <span class="switch-link" onclick="showSignInForm(event)">
+            <span data-i18n="login_already_text">Already have an account?</span>
+            &nbsp;
+            <span data-i18n="login_signin">Sign In</span>
+          </span>
+        </div>
+      </div>
+      <!-- Sign In Form -->
+      <div id="signInForm" class="form-section" style="display:none;">
+        <form id="signInAuthForm" onsubmit="handleSignInPhoneSubmit(event)">
+          <div class="form-group">
+            <label for="signInPhone" data-i18n="label_mobile">Mobile Number <span style="color:red">*</span></label>
+            <div class="phone-input-group" style="display:flex;align-items:center;gap:6px;">
+              <span class="country-code">+91</span>
+              <input type="tel" id="signInPhone" data-i18n-placeholder="placeholder_mobile" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" required>
+            </div>
+          </div>
+          <button type="submit" class="login-btn" data-i18n="login_send_otp">Send OTP</button>
+        </form>
+        <div style="text-align:center;margin-top:10px;">
+          <span class="switch-link" onclick="showCreateAccountForm(event)">New user? Create Account</span>
+        </div>
+      </div>
+      <!-- OTP Verification Form -->
+      <div id="otpForm" class="form-section" style="display:none;">
+        <div class="otp-info">An OTP has been sent to <strong id="displayPhone"></strong></div>
+        <form id="otpVerificationForm" onsubmit="handleOtpVerify(event)">
+          <div class="form-group">
+            <label for="otpInput">Enter 6-Digit OTP <span style="color:red">*</span></label>
+            <input type="text" id="otpInput" placeholder="000000" maxlength="6" pattern="[0-9]{6}" required>
+          </div>
+          <button type="submit" class="login-btn" data-i18n="login_verify_otp">Verify OTP</button>
+          <button type="button" class="login-btn btn-secondary" data-i18n="login_back" onclick="handleBackToForm()">Back</button>
+        </form>
+      </div>
+    </div>
+  </div>
+    <style>
+      .login-horizontal-forms {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 32px;
+        margin-top: 18px;
+      }
+      .login-horizontal-forms .form-section {
+        min-width: 320px;
+        max-width: 350px;
+        background: #f9fbe7;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(44,62,80,0.06);
+        padding: 22px 18px 18px 18px;
+        margin: 0;
+      }
+      @media (max-width: 900px) {
+        .login-horizontal-forms {
+          flex-direction: column;
+          align-items: center;
+          gap: 18px;
+        }
+      }
+    </style>
+  <script src="js/i18n.js"></script>
+  <script src="js/login.js"></script>
+  <script>
+    // Persist language selection and apply translation
+    const langSelect = document.getElementById('languageSelect');
+    // Set from localStorage if available
+    const savedLang = localStorage.getItem('selectedLanguage');
+    if (savedLang) langSelect.value = savedLang;
+    langSelect.addEventListener('change', function() {
+      localStorage.setItem('selectedLanguage', langSelect.value);
+      if (window.i18n) window.i18n.set(langSelect.value);
+    });
+    // On load, apply translation
+    if (window.i18n && langSelect.value) window.i18n.set(langSelect.value);
+  </script>
+</body>
+</html>
+
+

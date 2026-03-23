@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recommended Inputs - Smart Fertilizer & Irrigation Calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+      @media print {
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          background: white !important;
+        }
+        #pdf-export-container, .container {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+          min-width: 0 !important;
+          max-width: 100vw !important;
+          box-shadow: none !important;
+          background: white !important;
+          page-break-inside: avoid !important;
+        }
+        .pdf-header, .pdf-section-title {
+          margin-top: 0 !important;
+          padding-top: 0 !important;
+          page-break-after: avoid !important;
+        }
+        table, .results-table {
+          page-break-inside: avoid !important;
+          break-inside: avoid-page !important;
+          margin-top: 0 !important;
+        }
+        .pdf-page-break {
+          page-break-before: always !important;
+          break-before: page !important;
+        }
+        #npk-bar-chart-container, #micro-pie-chart-container, #extra-visualization-container {
+          width: 100% !important;
+          max-width: 100vw !important;
+          min-width: 0 !important;
+          margin: 16px 0 !important;
+          box-sizing: border-box !important;
+        }
+      }
+      /* For html2pdf.js PDF output, force container and charts to full width */
+      #pdf-export-container, .container {
+        width: 100% !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        background: white !important;
+        box-sizing: border-box !important;
+      }
+      .pdf-header, .pdf-section-title {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+      }
+      table, .results-table {
+        page-break-inside: avoid !important;
+        break-inside: avoid-page !important;
+        margin-top: 0 !important;
+      }
+      #npk-bar-chart-container, #micro-pie-chart-container, #extra-visualization-container {
+        width: 100% !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        margin: 16px 0 !important;
+        box-sizing: border-box !important;
+      }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<div class="user-header">
+  <img src="assets/logo.png" alt="Annadata Bharat logo" class="app-logo">
+  <span id="userName" class="user-name">User</span>
+  <button onclick="handleLogout()" class="logout-btn" data-i18n="logout" style="margin-left:0;">🚪 Logout</button>
+  <button onclick="window.open('contact.html', '_blank')" class="contact-btn" style="font-size:0.95rem;padding:4px 10px;min-width:100px;max-width:100px;height:32px;background:#f9fbe7;border:1px solid #ffd54f;color:#ff9800;border-radius:6px;font-weight:500;cursor:pointer;margin-left:8px;" data-i18n="contact">Contact</button>
+  <div style="flex:1;"></div>
+  <select id="languageSelect" class="language-select" aria-label="Select language">
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="bn">Bengali</option>
+    <option value="te">Telugu</option>
+    <option value="mr">Marathi</option>
+    <option value="ta">Tamil</option>
+    <option value="ur">Urdu</option>
+    <option value="gu">Gujarati</option>
+    <option value="kn">Kannada</option>
+    <option value="ml">Malayalam</option>
+    <option value="or">Odia</option>
+    <option value="pa">Punjabi</option>
+  </select>
+</div>
+<style>
+  .user-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 18px 30px 10px 30px;
+    background: linear-gradient(90deg, #2e7d32 0%, #388e3c 100%);
+    border-radius: 0 0 15px 15px;
+    margin-bottom: 24px;
+  }
+  .user-header .user-name {
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-right: 0;
+    display: flex;
+    align-items: center;
+  }
+  .user-header .logout-btn {
+    margin-left: 0;
+    margin-right: 12px;
+  }
+  .user-header .contact-btn {
+    background: #fffbe6;
+    color: #ff9800;
+    border: 2px solid #ffe0b2;
+    font-size: 0.95rem;
+    padding-left: 8px;
+    padding-right: 8px;
+    min-width: 100px;
+    max-width: 100px;
+    height: 32px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  .user-header .contact-btn:hover {
+    background: #ffe0b2;
+    color: #e65100;
+  }
+  .user-header .language-select {
+    margin-left: auto;
+  }
+</style>
+
+<div class="container">
+  <div id="pdf-export-container">
+    <h1 data-i18n="results_title">🌾 Recommended Inputs</h1>
+    <p class="subtitle" data-i18n="results_subtitle">Fertilizer & Irrigation Recommendations for Your Farm</p>
+    <div id="results"></div>
+    <!-- Chart containers for persistent visualizations (fallback, in case JS doesn't inject) -->
+    <div id="npk-bar-chart-container" style="width:700px;max-width:98vw;margin:32px auto;"></div>
+    <div id="micro-pie-chart-container" style="width:700px;max-width:98vw;margin:32px auto;"></div>
+    <div id="extra-visualization-container" style="width:700px;max-width:98vw;margin:32px auto;"></div>
+  </div>
+  <button onclick="goBackToCalculator()" class="btn-secondary" style="margin-top: 20px;" data-i18n="back_to_calculator">← Back to Calculator</button>
+  <button onclick="downloadPDF()" style="margin-top: 10px;" data-i18n="download_pdf">📥 Download as PDF</button>
+</div>
+</div>
+<!-- Scripts: Chart.js, i18n, visualization, results (order matters) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/visualization.js"></script>
+<script src="js/results.js"></script>
+</body>
+</html>
+</body>
+</html>
