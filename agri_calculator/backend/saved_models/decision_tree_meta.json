@@ -1,0 +1,9 @@
+{
+  "model_key": "decision_tree",
+  "display_name": "Decision Tree Regressor",
+  "version": "dt-v1.0.0",
+  "r2_score": 0.9938,
+  "rmse": 1.5841,
+  "trained_at": "2026-10-19T16:32:50.946699",
+  "description": "Fast tree-based regression model with clear rule splits."
+}

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../agri_calculator"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "agri_calculator"
+	}
+}

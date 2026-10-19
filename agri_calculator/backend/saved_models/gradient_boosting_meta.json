@@ -1,0 +1,9 @@
+{
+  "model_key": "gradient_boosting",
+  "display_name": "Gradient Boosting Regressor",
+  "version": "gb-v1.1.0",
+  "r2_score": 0.9981,
+  "rmse": 0.8648,
+  "trained_at": "2026-10-19T16:32:50.929679",
+  "description": "Sequential boosting model optimized for non-linear soil-yield relationships."
+}

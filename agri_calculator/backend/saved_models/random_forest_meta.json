@@ -1,0 +1,9 @@
+{
+  "model_key": "random_forest",
+  "display_name": "Random Forest Regressor",
+  "version": "rf-v1.2.0",
+  "r2_score": 0.9954,
+  "rmse": 1.3586,
+  "trained_at": "2026-10-19T16:32:50.549270",
+  "description": "Ensemble of decision trees. Highly accurate, resistant to overfitting."
+}

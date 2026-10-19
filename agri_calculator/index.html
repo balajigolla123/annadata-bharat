@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Fertilizer & Irrigation Calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- User Header -->
+<div class="user-header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="assets/logo.png" alt="Annadata Bharat logo" class="app-logo">
+    <span id="userName" class="user-name" style="font-size:1.1rem;">User</span>
+    <button onclick="window.location.href='history.html'" class="history-btn" style="font-size:0.95rem;padding:4px 12px;height:32px;background:#f9fbe7;border:1px solid #81c784;color:#2e7d32;border-radius:6px;font-weight:600;cursor:pointer;">📜 History</button>
+    <button onclick="handleLogout()" class="logout-btn" style="font-size:0.95rem;padding:4px 10px;min-width:100px;max-width:100px;height:32px;vertical-align:middle;border-radius:6px;border:1px solid #cfd8dc;background:#f9fbe7;color:#388e3c;font-weight:500;cursor:pointer;" data-i18n="logout">🚪</button>
+    <button onclick="window.open('contact.html', '_blank')" style="font-size:0.95rem;padding:4px 10px;min-width:100px;max-width:100px;height:32px;background:#f9fbe7;border:1px solid #ffd54f;color:#ff9800;border-radius:6px;font-weight:500;cursor:pointer;" data-i18n="contact">Contact</button>
+  </div>
+  <select id="languageSelect" class="language-select" aria-label="Select language" style="font-size:0.95rem;padding:4px 10px;min-width:120px;width:120px;position:absolute;top:18px;right:32px;">
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="bn">Bengali</option>
+    <option value="te">Telugu</option>
+    <option value="mr">Marathi</option>
+    <option value="ta">Tamil</option>
+    <option value="ur">Urdu</option>
+    <option value="gu">Gujarati</option>
+    <option value="kn">Kannada</option>
+    <option value="ml">Malayalam</option>
+    <option value="or">Odia</option>
+    <option value="pa">Punjabi</option>
+  </select>
+</div>
+
+<div class="container">
+  <h1 data-i18n="main_title">🌾 Smart Fertilizer & Irrigation Calculator</h1>
+  <p class="subtitle" data-i18n="main_subtitle">Crop & soil based nutrient and irrigation recommendation</p>
+
+  <div class="grid">
+    <div>
+      <label data-i18n="label_crop">Crop Type <span style="color:red">*</span></label>
+      <input type="text" id="cropSearch" data-i18n-placeholder="placeholder_crop_search" placeholder="Type to search crop..." style="width:100%;margin-bottom:8px;">
+      <select id="crop" style="width:100%;height:48px;">
+        <option value="" data-i18n-placeholder="">Select crop</option>
+        <option value="rice" data-i18n="crop_rice">Rice</option>
+        <option value="wheat" data-i18n="crop_wheat">Wheat</option>
+        <option value="maize" data-i18n="crop_maize">Maize</option>
+        <option value="cotton" data-i18n="crop_cotton">Cotton</option>
+        <option value="tomato" data-i18n="crop_tomato">Tomato</option>
+        <option value="groundnut" data-i18n="crop_groundnut">Groundnut</option>
+        <option value="sugarcane" data-i18n="crop_sugarcane">Sugarcane</option>
+        <option value="barley">Barley</option>
+        <option value="jowar">Jowar (Sorghum)</option>
+        <option value="bajra">Bajra (Pearl Millet)</option>
+        <option value="soybean">Soybean</option>
+        <option value="mustard">Mustard</option>
+        <option value="sunflower">Sunflower</option>
+        <option value="chickpea">Chickpea (Gram)</option>
+        <option value="lentil">Lentil</option>
+        <option value="pea">Pea</option>
+        <option value="pigeonpea">Pigeonpea (Arhar)</option>
+        <option value="blackgram">Black Gram (Urad)</option>
+        <option value="greengram">Green Gram (Moong)</option>
+        <option value="sesame">Sesame (Til)</option>
+        <option value="safflower">Safflower</option>
+        <option value="castor">Castor</option>
+        <option value="linseed">Linseed</option>
+        <option value="potato">Potato</option>
+        <option value="onion">Onion</option>
+        <option value="garlic">Garlic</option>
+        <option value="carrot">Carrot</option>
+        <option value="cabbage">Cabbage</option>
+        <option value="cauliflower">Cauliflower</option>
+        <option value="brinjal">Brinjal (Eggplant)</option>
+        <option value="chili">Chili</option>
+        <option value="okra">Okra (Lady Finger)</option>
+        <option value="spinach">Spinach</option>
+        <option value="fenugreek">Fenugreek (Methi)</option>
+        <option value="coriander">Coriander</option>
+        <option value="turmeric">Turmeric</option>
+        <option value="ginger">Ginger</option>
+        <option value="banana">Banana</option>
+        <option value="mango">Mango</option>
+        <option value="guava">Guava</option>
+        <option value="papaya">Papaya</option>
+        <option value="pomegranate">Pomegranate</option>
+        <option value="grapes">Grapes</option>
+        <option value="apple">Apple</option>
+        <option value="orange">Orange</option>
+        <option value="lemon">Lemon</option>
+        <option value="pineapple">Pineapple</option>
+        <option value="watermelon">Watermelon</option>
+        <option value="muskmelon">Muskmelon</option>
+        <option value="coconut">Coconut</option>
+        <option value="arecanut">Arecanut</option>
+        <option value="cashew">Cashew</option>
+        <option value="tea">Tea</option>
+        <option value="coffee">Coffee</option>
+        <option value="rubber">Rubber</option>
+        <option value="cardamom">Cardamom</option>
+        <option value="pepper">Pepper</option>
+        <option value="clove">Clove</option>
+        <option value="cinnamon">Cinnamon</option>
+        <option value="sugarbeet">Sugar Beet</option>
+        <option value="jute">Jute</option>
+        <option value="tobacco">Tobacco</option>
+        <option value="hemp">Hemp</option>
+        <option value="saffron">Saffron</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div>
+      <label data-i18n="label_area">Area (Hectares) <span style="color:red">*</span></label>
+      <input type="number" id="area" data-i18n-placeholder="placeholder_area" placeholder="e.g. 1.5">
+    </div>
+
+    <div>
+      <label data-i18n="label_soil_type">Soil Type <span style="color:red">*</span></label>
+      <select id="soilType">
+        <option value="" data-i18n-placeholder="">Select soil type</option>
+        <option value="red" data-i18n="soil_red">Red Soil</option>
+        <option value="black" data-i18n="soil_black">Black Soil</option>
+        <option value="alluvial" data-i18n="soil_alluvial">Alluvial Soil</option>
+        <option value="laterite" data-i18n="soil_laterite">Laterite Soil</option>
+        <option value="desert" data-i18n="soil_desert">Desert Soil</option>
+        <option value="mountain" data-i18n="soil_mountain">Mountain Soil</option>
+        <option value="saline" data-i18n="soil_saline">Saline Soil</option>
+        <option value="peaty" data-i18n="soil_peaty">Peaty Soil</option>
+        <option value="forest" data-i18n="soil_forest">Forest Soil</option>
+        <option value="coastal" data-i18n="soil_coastal">Coastal Soil</option>
+      </select>
+    </div>
+
+    <div>
+      <label data-i18n="label_soil_texture">Soil Texture Type <span style="color:red">*</span></label>
+      <select id="soilTexture">
+        <option value="" data-i18n-placeholder="">Select texture</option>
+        <option value="sandy" data-i18n="texture_sandy">Sandy</option>
+        <option value="loamy" data-i18n="texture_loamy">Loamy</option>
+        <option value="clay" data-i18n="texture_clay">Clay</option>
+        <option value="loamy_sand" data-i18n="texture_loamy_sand">Loamy Sand</option>
+        <option value="sandy_loam" data-i18n="texture_sandy_loam">Sandy Loam</option>
+        <option value="silty_loam" data-i18n="texture_silty_loam">Silty Loam</option>
+        <option value="clay_loam" data-i18n="texture_clay_loam">Clay Loam</option>
+        <option value="sandy_clay_loam" data-i18n="texture_sandy_clay_loam">Sandy Clay Loam</option>
+        <option value="silty_clay_loam" data-i18n="texture_silty_clay_loam">Silty Clay Loam</option>
+        <option value="sandy_clay" data-i18n="texture_sandy_clay">Sandy Clay</option>
+        <option value="silty_clay" data-i18n="texture_silty_clay">Silty Clay</option>
+      </select>
+    </div>
+
+    <div>
+      <label data-i18n="label_sowing_date">Sowing Date <span style="color:red">*</span></label>
+      <input type="date" id="sowingDate">
+    </div>
+  </div>
+
+  <div class="soil-box">
+    <h3 data-i18n="soil_box_title">Optional Soil Test Details</h3>
+    <div class="grid">
+      <div>
+        <label data-i18n="label_n">Nitrogen Value (kg/ha)</label>
+        <input type="number" id="n" placeholder="e.g. 200">
+      </div>
+
+      <div>
+        <label data-i18n="label_p">Phosphorus Value (kg/ha)</label>
+        <input type="number" id="p" placeholder="e.g. 30">
+      </div>
+
+      <div>
+        <label data-i18n="label_k">Potassium Value (kg/ha)</label>
+        <input type="number" id="k" placeholder="e.g. 120">
+      </div>
+
+      <div>
+        <label data-i18n="label_ph">Soil pH</label>
+        <input type="number" id="ph" step="0.1" placeholder="e.g. 6.5">
+      </div>
+
+      <div>
+        <label data-i18n="label_zn">Zinc (ppm)</label>
+        <input type="number" id="zn" placeholder="e.g. 0.5">
+      </div>
+
+      <div>
+        <label data-i18n="label_fe">Iron (ppm)</label>
+        <input type="number" id="fe" placeholder="e.g. 5">
+      </div>
+
+      <div>
+        <label data-i18n="label_b">Boron (ppm)</label>
+        <input type="number" id="b" placeholder="e.g. 0.2">
+      </div>
+
+      <div>
+        <label data-i18n="label_cu">Copper (ppm)</label>
+        <input type="number" id="cu" placeholder="e.g. 0.5">
+      </div>
+    </div>
+  </div>
+
+  <button onclick="calculate()" data-i18n="calculate">Calculate Recommendation</button>
+
+  <div id="result" class="result"></div>
+
+  <button onclick="downloadPDF()" style="margin-top:20px;" data-i18n="download_pdf">Download as PDF</button>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script src="js/script.js"></script>
+<script>
+  // Crop search functionality
+  const cropSearch = document.getElementById('cropSearch');
+  const cropSelect = document.getElementById('crop');
+  cropSearch.addEventListener('input', function() {
+    const filter = cropSearch.value.toLowerCase();
+    let anyVisible = false;
+    for (let option of cropSelect.options) {
+      if (option.value === "") {
+        option.style.display = '';
+        continue;
+      }
+      const text = option.textContent.toLowerCase();
+      if (filter && !text.includes(filter)) {
+        option.style.display = 'none';
+      } else {
+        option.style.display = '';
+        anyVisible = true;
+      }
+    }
+    // If no match, keep all hidden except 'Select crop'
+    if (filter && !anyVisible) {
+      for (let option of cropSelect.options) {
+        if (option.value !== "") option.style.display = 'none';
+      }
+    }
+  });
+  // Select crop on change
+  cropSelect.addEventListener('change', function() {
+    const currentLang = localStorage.getItem('selectedLanguage') || 'en';
+    cropSearch.value = cropSelect.options[cropSelect.selectedIndex].text;
+    // If 'Other' is selected, allow user to type custom crop name
+    if (cropSelect.value === 'other') {
+      cropSearch.value = '';
+      cropSearch.placeholder = (window.i18n && window.i18n.t(currentLang, 'placeholder_crop_custom')) || 'Type your crop name...';
+      cropSearch.focus();
+    } else {
+      cropSearch.placeholder = (window.i18n && window.i18n.t(currentLang, 'placeholder_crop_search')) || 'Type to search crop...';
+    }
+  });
+
+  // When submitting, use custom crop name if 'Other' is selected
+  function getSelectedCrop() {
+    if (cropSelect.value === 'other' && cropSearch.value.trim()) {
+      return cropSearch.value.trim();
+    }
+    return cropSelect.value;
+  }
+
+  // Patch the global calculate() to use getSelectedCrop()
+  window._originalCalculate = window.calculate;
+  window.calculate = function() {
+    const crop = getSelectedCrop().toLowerCase();
+    // ...existing code...
+    window._originalCalculate.call(this);
+  };
+</script>
+<script>
+  // Persist language selection and apply translation
+  const langSelect = document.getElementById('languageSelect');
+  // Set from localStorage if available
+  const savedLang = localStorage.getItem('selectedLanguage');
+  if (savedLang) langSelect.value = savedLang;
+  langSelect.addEventListener('change', function() {
+    localStorage.setItem('selectedLanguage', langSelect.value);
+    if (window.i18n) window.i18n.set(langSelect.value);
+  });
+  // On load, apply translation
+  if (window.i18n && langSelect.value) window.i18n.set(langSelect.value);
+
+  // Show user name (not mobile) in profile
+  const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+  if (user && user.name) {
+    document.getElementById('userName').innerHTML = '<span style="color:purple;font-size:1.2em;vertical-align:middle;">&#128100;</span> ' + user.name;
+  }
+</script>
+</body>
+</html>

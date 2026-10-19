@@ -1,0 +1,9 @@
+{
+  "model_key": "ridge",
+  "display_name": "Ridge Linear Regressor",
+  "version": "ridge-v1.0.0",
+  "r2_score": 0.9623,
+  "rmse": 3.9041,
+  "trained_at": "2026-10-19T16:32:50.964995",
+  "description": "L2-regularized linear model providing a robust baseline."
+}

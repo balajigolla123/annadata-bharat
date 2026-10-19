@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recommendation History - Smart Fertilizer & Irrigation Calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .history-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .history-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .crop-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: capitalize;
+    }
+    .model-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #e3f2fd;
+      color: #1565c0;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .detail-item {
+      background: #f9fbe7;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border-left: 4px solid #8bc34a;
+    }
+    .detail-label {
+      font-size: 0.78rem;
+      color: #689f38;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .detail-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #2e7d32;
+    }
+    .actions-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 14px;
+    }
+    .btn-view {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .btn-view:hover {
+      background: #1b5e20;
+    }
+    .btn-delete {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .btn-delete:hover {
+      background: #ffcdd2;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 2px dashed #cfd8dc;
+    }
+    .search-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #cfd8dc;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<!-- User Header -->
+<div class="user-header" style="display:flex;align-items:center;justify-content:flex-start;padding:18px 30px 10px 30px;background:linear-gradient(90deg, #2e7d32 0%, #388e3c 100%);border-radius:0 0 15px 15px;margin-bottom:24px;">
+  <img src="assets/logo.png" alt="Annadata Bharat logo" class="app-logo">
+  <span id="userName" class="user-name" style="color:#fff;font-size:1.15rem;font-weight:600;display:flex;align-items:center;margin-right:16px;">👤 Farmer</span>
+  <button onclick="window.location.href='index.html'" class="btn-secondary" style="font-size:0.95rem;padding:6px 14px;height:34px;background:#f9fbe7;border:1px solid #cfd8dc;color:#2e7d32;border-radius:6px;font-weight:600;cursor:pointer;margin-right:10px;">← Back to Calculator</button>
+  <button onclick="handleLogout()" class="logout-btn" style="font-size:0.95rem;padding:6px 12px;height:34px;background:#f9fbe7;border:1px solid #cfd8dc;color:#388e3c;border-radius:6px;font-weight:500;cursor:pointer;margin-right:10px;">🚪 Logout</button>
+  <div style="flex:1;"></div>
+  <select id="languageSelect" class="language-select" aria-label="Select language" style="border-radius:6px;padding:6px 10px;">
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="bn">Bengali</option>
+    <option value="te">Telugu</option>
+    <option value="mr">Marathi</option>
+    <option value="ta">Tamil</option>
+    <option value="ur">Urdu</option>
+    <option value="gu">Gujarati</option>
+    <option value="kn">Kannada</option>
+    <option value="ml">Malayalam</option>
+    <option value="or">Odia</option>
+    <option value="pa">Punjabi</option>
+  </select>
+</div>
+
+<div class="container" style="max-width:960px;margin:0 auto 40px auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
+    <h1 style="color:#2e7d32;margin:0;font-size:2rem;">📜 Previous Calculation History</h1>
+    <button onclick="window.location.href='index.html'" style="background:#2e7d32;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.95rem;">➕ New Calculation</button>
+  </div>
+  <p class="subtitle" style="margin-top:4px;color:#555;">Review all your past fertilizer recommendations and crop yield calculations.</p>
+
+  <!-- Search and Filter -->
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search calculations by crop, soil, or model..." oninput="filterHistory()">
+  </div>
+
+  <!-- History Container -->
+  <div id="historyListContainer">
+    <div style="text-align:center;padding:40px;">
+      <p style="font-size:1.1rem;color:#666;">⏳ Loading your previous calculations...</p>
+    </div>
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script src="js/history.js"></script>
+<script>
+  function handleLogout() {
+    if (confirm("Are you sure you want to logout?")) {
+      sessionStorage.removeItem("currentUser");
+      window.location.href = "login.html";
+    }
+  }
+
+  // Load language settings
+  const langSelect = document.getElementById('languageSelect');
+  const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+  if (savedLang) langSelect.value = savedLang;
+  langSelect.addEventListener('change', function() {
+    localStorage.setItem('selectedLanguage', langSelect.value);
+    if (window.i18n) window.i18n.set(langSelect.value);
+  });
+</script>
+</body>
+</html>
