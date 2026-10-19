@@ -80,90 +80,47 @@ All recommendations follow **ICAR (Indian Council of Agricultural Research) guid
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** HTML, CSS, JavaScript
-* **Storage:** LocalStorage & SessionStorage
-* **Libraries:**
-
-  * Chart.js (data visualization)
-  * html2pdf.js (PDF export)
-
----
-
-## 📁 Project Structure
-
-```
-project/
-│
-├── index.html            # Main calculator page
-├── login.html            # Authentication page
-├── results.html          # Results & report page
-├── contact.html          # Contact details
-│
-├── css/
-│   ├── style.css
-│   └── login.css
-│
-├── js/
-│   ├── script.js         # Main calculator logic
-│   ├── results.js        # Report generation
-│   ├── login.js          # Authentication logic
-│   ├── visualization.js  # Charts
-│   └── i18n.js           # Multi-language support
-│
-├── assets/               # Images (logo, etc.)
-├── SETUP_GUIDE.md        # Setup instructions
-└── ICAR_INTEGRATION.md   # ICAR documentation
-```
+* **Frontend:** HTML5, CSS3, JavaScript (ES6+), Chart.js, html2pdf.js
+* **Backend:** Python 3.13, Flask REST API
+* **Database:** MongoDB & PyMongo
+* **Machine Learning:** scikit-learn (Random Forest Regressor, Gradient Boosting, Decision Tree, Ridge)
+* **Cloud & Hosting:** Vercel (Serverless Python Functions & Static CDN)
 
 ---
 
-## ⚙️ How to Run
+## 🍃 MongoDB & PyMongo Integration
 
-### 🔹 Step 1: Clone Repository
+| Feature | Description | Collection |
+|---|---|---|
+| **Save Farm Details** | Stores crop, acreage, soil type & texture, and sowing date | `farm_details` |
+| **Recommendation History** | Farmers can view, filter, and reload past calculation snapshots | `recommendation_history` |
+| **Farmer Profile** | Stores profile on registration and tracks last login | `farmer_profiles` |
+| **ML Prediction** | Predicts crop harvest with Random Forest and records prediction & model version | `ml_predictions` |
 
+---
+
+## 🚀 How to Run Locally
+
+### 1️⃣ Start Backend (Flask + PyMongo + ML)
 ```bash
-git clone https://github.com/your-username/agriculture-calculator.git
-cd agriculture-calculator
+py -3 run_backend.py
+# Or double-click run_backend.bat
 ```
 
-### 🔹 Step 2: Open in Browser
-
-Simply open:
-
-```bash
-login.html
+### 2️⃣ Open the Application
+Navigate to:
+```
+http://127.0.0.1:5000
 ```
 
-No backend required (fully frontend-based).
-
 ---
 
-## 🧪 Testing
+## ☁️ Deployment on Vercel
 
-* Register using any phone number
-* OTP will appear in:
-
-  * Browser alert
-  * Console log
-* Use OTP to login and test calculator features
-
----
-
-## 🔐 Data Handling
-
-* **localStorage:** Stores user accounts
-* **sessionStorage:** Stores current login session
-* No external database required
-
----
-
-## 📈 Future Enhancements
-
-* 📡 Real SMS OTP integration (Twilio/Firebase)
-* 🌦 Weather-based recommendations
-* 📍 Location-based ICAR guidelines
-* 🌱 Organic fertilizer suggestions
-* 📊 Farmer dashboard
+1. Import this repository on [Vercel](https://vercel.com/new).
+2. Set **Root Directory** to `agri_calculator`.
+3. In **Environment Variables**, add `MONGODB_URI` pointing to your MongoDB Atlas cluster.
+4. Click **Deploy**! Vercel automatically deploys the frontend and serverless Python backend.
 
 ---
 
