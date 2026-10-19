@@ -6,7 +6,7 @@ A web-based agriculture tool that provides **crop-specific fertilizer recommenda
 
 ## 🌐 Live Demo
 
-👉 **Open the website:** [https://annadatabharat.netlify.app](https://annadatabharat.netlify.app)
+👉 **Open the website:** annadata-bharat.vercel.app
 
 ---
 
@@ -121,12 +121,6 @@ http://127.0.0.1:5000
 2. Set **Root Directory** to `agri_calculator`.
 3. In **Environment Variables**, add `MONGODB_URI` pointing to your MongoDB Atlas cluster.
 4. Click **Deploy**! Vercel automatically deploys the frontend and serverless Python backend.
-
----
-
-## 🤝 Contributing
-
-Feel free to fork this repository and submit pull requests.
 
 ---
 
