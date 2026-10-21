@@ -1,211 +1,138 @@
-// Store OTP locally (front-end demo mode / backend fallback)
-let generatedOtp = null;
-// Current phone for which OTP was requested (used during verification)
-let currentPhone = null;
-// Current authenticated user object from MongoDB
-let authenticatedUser = null;
+/**
+ * Annadata Bharat - Farmer Authentication Controller
+ * Direct Username & Password authentication with MongoDB and PyMongo.
+ * Allows existing users to log in directly, or directs new users to sign in / create an account.
+ */
 
-// Helper: get & save registered users in localStorage (offline cache)
-function getRegisteredUsers() {
+// Toggle between Login and Sign Up forms
+function showLoginForm() {
+  const loginCard = document.getElementById("loginFormCard");
+  const signUpCard = document.getElementById("signUpFormCard");
+  if (loginCard) loginCard.style.display = "block";
+  if (signUpCard) signUpCard.style.display = "none";
+}
+
+function showSignUpForm(prefillUsername = "") {
+  const loginCard = document.getElementById("loginFormCard");
+  const signUpCard = document.getElementById("signUpFormCard");
+  if (loginCard) loginCard.style.display = "none";
+  if (signUpCard) signUpCard.style.display = "block";
+
+  if (prefillUsername) {
+    const regUserInput = document.getElementById("regUsername");
+    if (regUserInput) regUserInput.value = prefillUsername;
+  }
+}
+
+// Handle Farmer Login
+async function handleLoginSubmit(event) {
+  event.preventDefault();
+  const usernameInput = document.getElementById("loginUsername");
+  const passwordInput = document.getElementById("loginPassword");
+
+  const username = usernameInput ? usernameInput.value.trim() : "";
+  const password = passwordInput ? passwordInput.value : "";
+
+  if (!username || !password) {
+    alert("Please enter both username and password.");
+    return;
+  }
+
+  // Attempt login via API client
+  if (!window.AgriAPI) {
+    alert("API Client not loaded. Please refresh the page.");
+    return;
+  }
+
   try {
-    return JSON.parse(localStorage.getItem("agriRegisteredUsers") || "[]");
-  } catch (e) {
-    return [];
-  }
-}
+    const res = await window.AgriAPI.loginFarmer(username, password);
 
-function saveRegisteredUsers(users) {
-  localStorage.setItem("agriRegisteredUsers", JSON.stringify(users));
-}
-
-
-
-// Show sign in form
-function showSignInForm(event) {
-  if (event) event.preventDefault();
-  document.getElementById("loginForm").style.display = "none";
-  document.getElementById("signInForm").style.display = "block";
-}
-
-// Show create account form
-function showCreateAccountForm(event) {
-  if (event) event.preventDefault();
-  document.getElementById("signInForm").style.display = "none";
-  document.getElementById("loginForm").style.display = "block";
-}
-
-// Generate demo OTP for fast farmer testing
-async function requestOtpForPhone(phone) {
-  generatedOtp = Math.floor(100000 + Math.random() * 900000);
-  console.log(`📱 Generated OTP for +91${phone}: ${generatedOtp}`);
-  alert(`🌾 Verification OTP (Demo):\n\n${generatedOtp}\n\n(Enter this 6-digit code to complete login)`);
-  return true;
-}
-
-// Handle phone submit (create account / register farmer profile in MongoDB)
-async function handlePhoneSubmit(event) {
-  event.preventDefault();
-  const name = document.getElementById("userName").value.trim();
-  const phone = document.getElementById("userPhone").value.trim();
-  const pincode = document.getElementById("userPincode").value.trim();
-
-  if (!name || !phone || !pincode) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
-    alert("Please enter a valid 10-digit mobile number");
-    return;
-  }
-
-  // Feature 3: Register farmer profile in MongoDB using PyMongo via API
-  let mongoUser = null;
-  if (window.AgriAPI) {
-    try {
-      const res = await window.AgriAPI.registerFarmer(name, phone, pincode);
-      if (res && res.success && res.user) {
-        mongoUser = res.user;
-        authenticatedUser = res.user;
-        console.log("✅ Farmer profile saved in MongoDB via PyMongo:", mongoUser);
-      }
-    } catch (err) {
-      console.warn("MongoDB API sync warning, caching locally:", err);
+    if (res && res.success && res.user) {
+      const user = res.user;
+      const sessionUser = {
+        id: user.id || user._id,
+        username: user.username || username,
+        name: user.name || user.username || "Farmer",
+        phone: user.phone || username,
+        pincode: user.pincode || ""
+      };
+      sessionStorage.setItem("currentUser", JSON.stringify(sessionUser));
+      alert(`Login Successful ✅ Welcome, ${sessionUser.name}!`);
+      window.location.href = "index.html";
+      return;
     }
-  }
 
-  // Backup in local storage
-  const users = getRegisteredUsers();
-  const existingIdx = users.findIndex(u => u.phone === phone);
-  const userObj = mongoUser || {
-    name,
-    phone,
-    pincode,
-    createdAt: new Date().toISOString()
-  };
-
-  if (existingIdx >= 0) {
-    users[existingIdx] = userObj;
-  } else {
-    users.push(userObj);
-  }
-  saveRegisteredUsers(users);
-
-  // Request OTP
-  const ok = await requestOtpForPhone(phone);
-  if (!ok) return;
-
-  currentPhone = phone;
-  document.getElementById("loginForm").style.display = "none";
-  document.getElementById("otpForm").style.display = "block";
-  document.getElementById("displayPhone").innerText = "+91 " + phone;
-}
-
-// Handle sign in phone submit (authenticate farmer from MongoDB)
-async function handleSignInPhoneSubmit(event) {
-  event.preventDefault();
-  const phone = document.getElementById("signInPhone").value.trim();
-  if (!phone) {
-    alert("Please enter your mobile number");
-    return;
-  }
-
-  if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
-    alert("Please enter a valid 10-digit mobile number");
-    return;
-  }
-
-  // Feature 3: Check farmer profile in MongoDB via PyMongo
-  let userFound = false;
-  if (window.AgriAPI) {
-    try {
-      const res = await window.AgriAPI.loginFarmer(phone);
-      if (res && res.success && res.user) {
-        authenticatedUser = res.user;
-        userFound = true;
-        console.log("✅ Farmer authenticated from MongoDB:", authenticatedUser);
-      }
-    } catch (err) {
-      console.warn("MongoDB login check failed, falling back to local cache:", err);
+    if (res && res.not_found) {
+      alert(`User "${username}" does not exist. Please sign up to create an account.`);
+      showSignUpForm(username);
+      return;
     }
+
+    alert(res?.error || "Incorrect password. Please try again.");
+  } catch (err) {
+    console.error("Login submission error:", err);
+    alert("Error logging in: " + err.message);
   }
-
-  // Check local cache if not found in MongoDB
-  if (!userFound) {
-    const users = getRegisteredUsers();
-    const existing = users.find(u => u.phone === phone);
-    if (existing) {
-      authenticatedUser = existing;
-      userFound = true;
-    }
-  }
-
-  if (!userFound) {
-    alert("No farmer account found for this mobile number. Please create an account first.");
-    showCreateAccountForm(event);
-    document.getElementById("userPhone").value = phone;
-    return;
-  }
-
-  // Request OTP
-  const ok = await requestOtpForPhone(phone);
-  if (!ok) return;
-
-  currentPhone = phone;
-  document.getElementById("signInForm").style.display = "none";
-  document.getElementById("otpForm").style.display = "block";
-  document.getElementById("displayPhone").innerText = "+91 " + phone;
 }
 
-// Verify OTP
-async function handleOtpVerify(event) {
+// Handle Farmer Sign Up / Registration
+async function handleSignUpSubmit(event) {
   event.preventDefault();
-  const enteredOtp = document.getElementById("otpInput").value.trim();
+  const name = document.getElementById("regName").value.trim();
+  const username = document.getElementById("regUsername").value.trim().toLowerCase();
+  const phone = document.getElementById("regPhone").value.trim();
+  const pincode = document.getElementById("regPincode").value.trim();
+  const password = document.getElementById("regPassword").value;
 
-  if (!enteredOtp) {
-    alert("Please enter the OTP");
+  if (!name || !username || !password) {
+    alert("Full Name, Username, and Password are required.");
     return;
   }
 
-  if (!generatedOtp) {
-    alert("No OTP generated. Please request OTP again.");
+  if (password.length < 4) {
+    alert("Password must be at least 4 characters long.");
     return;
   }
 
-  if (enteredOtp == generatedOtp) {
-    alert("Login Successful ✅");
-
-    const users = getRegisteredUsers();
-    const existing = users.find(u => u.phone === currentPhone);
-
-    const name = authenticatedUser?.name || existing?.name || document.getElementById("userName")?.value.trim() || "Farmer";
-    const pincode = authenticatedUser?.pincode || existing?.pincode || document.getElementById("userPincode")?.value.trim() || "";
-    const mongoId = authenticatedUser?.id || null;
-
-    // Save active farmer session
-    const sessionUser = {
-      id: mongoId,
-      name: name,
-      phone: currentPhone,
-      pincode: pincode,
-      source: "mongodb_pymongo"
-    };
-    sessionStorage.setItem("currentUser", JSON.stringify(sessionUser));
-
-    // Redirect to calculator
-    window.location.href = "index.html";
-  } else {
-    alert("Invalid OTP ❌ Please try again.");
+  if (phone && (phone.length !== 10 || !/^\d{10}$/.test(phone))) {
+    alert("Please enter a valid 10-digit mobile number, or leave it blank.");
+    return;
   }
-}
 
-// Back button
-function handleBackToForm() {
-  if (document.getElementById("signInForm").style.display === "block") {
-    document.getElementById("signInForm").style.display = "block";
-    document.getElementById("otpForm").style.display = "none";
-  } else {
-    document.getElementById("loginForm").style.display = "block";
-    document.getElementById("otpForm").style.display = "none";
+  if (!window.AgriAPI) {
+    alert("API Client not loaded. Please refresh the page.");
+    return;
+  }
+
+  try {
+    const res = await window.AgriAPI.registerFarmer(name, username, phone, password, pincode);
+
+    if (res && res.success && res.user) {
+      const user = res.user;
+      const sessionUser = {
+        id: user.id || user._id,
+        username: user.username || username,
+        name: user.name || name,
+        phone: user.phone || phone,
+        pincode: user.pincode || pincode
+      };
+      sessionStorage.setItem("currentUser", JSON.stringify(sessionUser));
+      alert(`Account created successfully! ✅ Welcome, ${sessionUser.name}!`);
+      window.location.href = "index.html";
+      return;
+    }
+
+    if (res && res.exists) {
+      alert(res.error || `Username "${username}" already exists. Please log in.`);
+      showLoginForm();
+      const loginUserInput = document.getElementById("loginUsername");
+      if (loginUserInput) loginUserInput.value = username;
+      return;
+    }
+
+    alert(res?.error || "Registration could not be completed. Please try again.");
+  } catch (err) {
+    console.error("Registration submission error:", err);
+    alert("Error creating account: " + err.message);
   }
 }

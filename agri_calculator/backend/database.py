@@ -8,6 +8,7 @@ Implements all four core features:
 """
 
 import datetime
+import hashlib
 import logging
 from typing import Dict, Any, List, Optional
 from pymongo import MongoClient, ASCENDING, DESCENDING
@@ -64,8 +65,12 @@ class MongoManager:
         if not self.is_connected or self.db is None:
             return
         try:
-            # 1. Farmer profiles: unique index on phone
-            self.db[COLL_FARMERS].create_index([("phone", ASCENDING)], unique=True)
+            # 1. Farmer profiles: index on username and phone
+            try:
+                self.db[COLL_FARMERS].create_index([("username", ASCENDING)], unique=True, sparse=True)
+                self.db[COLL_FARMERS].create_index([("phone", ASCENDING)], sparse=True)
+            except Exception as ie:
+                logger.warning("Index creation notice: %s", ie)
 
             # 2. Farm details: index on farmer_phone and created_at
             self.db[COLL_FARM_DETAILS].create_index([("farmer_phone", ASCENDING), ("created_at", DESCENDING)])
@@ -125,22 +130,44 @@ def serialize_docs(docs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 # FEATURE 3: FARMER PROFILE (Registration, Login, Profile Retrieval)
 # ===================================================================
 
-def register_farmer(name: str, phone: str, pincode: str) -> Dict[str, Any]:
+def hash_password(password: str) -> str:
+    """Hash password with SHA-256 for secure MongoDB storage."""
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+def register_farmer(
+    name: str = "",
+    phone: str = "",
+    pincode: str = "",
+    username: str = "",
+    password: str = ""
+) -> Dict[str, Any]:
     """
-    Register a new farmer profile in MongoDB using PyMongo.
+    Register a new farmer profile in MongoDB with username & password using PyMongo.
     Returns status and user document.
     """
     db_mgr = MongoManager()
     if not db_mgr.is_connected:
         raise RuntimeError("MongoDB connection unavailable")
 
-    phone = str(phone).strip()
     name = str(name).strip()
+    phone = str(phone).strip()
     pincode = str(pincode).strip()
+    u = str(username).strip().lower() if username else (phone or name.lower().replace(" ", "_"))
+    p = str(password).strip() if password else "123456"
+
+    if not u:
+        return {"success": False, "error": "Username is required"}
+
+    # Check if username is already taken
+    existing = db_mgr.db[COLL_FARMERS].find_one({"username": u})
+    if existing:
+        return {"success": False, "exists": True, "error": f"Username '{u}' is already registered. Please log in."}
 
     now = datetime.datetime.utcnow()
     farmer_doc = {
-        "name": name,
+        "username": u,
+        "password_hash": hash_password(p),
+        "name": name or u,
         "phone": phone,
         "pincode": pincode,
         "created_at": now,
@@ -152,42 +179,83 @@ def register_farmer(name: str, phone: str, pincode: str) -> Dict[str, Any]:
     try:
         res = db_mgr.db[COLL_FARMERS].insert_one(farmer_doc)
         farmer_doc["_id"] = res.inserted_id
-        return {"success": True, "created": True, "user": serialize_doc(farmer_doc)}
+        serialized = serialize_doc(farmer_doc)
+        serialized.pop("password_hash", None)
+        return {"success": True, "created": True, "user": serialized}
     except DuplicateKeyError:
-        # User already exists, update name and pincode if needed
-        db_mgr.db[COLL_FARMERS].update_one(
-            {"phone": phone},
-            {"$set": {"name": name, "pincode": pincode, "last_login": now}}
-        )
-        existing = db_mgr.db[COLL_FARMERS].find_one({"phone": phone})
-        return {"success": True, "created": False, "user": serialize_doc(existing)}
+        # Fallback query
+        existing = db_mgr.db[COLL_FARMERS].find_one({"$or": [{"username": u}, {"phone": phone}]})
+        if existing:
+            serialized = serialize_doc(existing)
+            serialized.pop("password_hash", None)
+            return {"success": True, "created": False, "user": serialized}
+        return {"success": False, "error": "User with this username or phone already exists"}
 
-def login_farmer(phone: str) -> Optional[Dict[str, Any]]:
+def login_farmer(username_or_phone: str, password: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """
-    Log in farmer by phone, updates last_login timestamp.
+    Log in farmer by username or phone with password validation.
+    Updates last_login timestamp in MongoDB.
     """
     db_mgr = MongoManager()
     if not db_mgr.is_connected:
         raise RuntimeError("MongoDB connection unavailable")
 
-    phone = str(phone).strip()
+    ident = str(username_or_phone).strip().lower()
+    if not ident:
+        return None
+
+    user = db_mgr.db[COLL_FARMERS].find_one({
+        "$or": [
+            {"username": ident},
+            {"phone": ident}
+        ]
+    })
+
+    if not user:
+        return None
+
+    # If password is provided, verify it
+    if password is not None:
+        expected_hash = user.get("password_hash")
+        if expected_hash:
+            if hash_password(password) != expected_hash:
+                return {"_error": "Incorrect password. Please try again."}
+        else:
+            # Set initial password hash for legacy records
+            db_mgr.db[COLL_FARMERS].update_one(
+                {"_id": user["_id"]},
+                {"$set": {"password_hash": hash_password(password)}}
+            )
+
     now = datetime.datetime.utcnow()
-
-    res = db_mgr.db[COLL_FARMERS].find_one_and_update(
-        {"phone": phone},
-        {"$set": {"last_login": now}},
-        return_document=True
+    db_mgr.db[COLL_FARMERS].update_one(
+        {"_id": user["_id"]},
+        {"$set": {"last_login": now}}
     )
-    return serialize_doc(res)
+    user["last_login"] = now
 
-def get_farmer_profile(phone: str) -> Optional[Dict[str, Any]]:
-    """Retrieve farmer profile by mobile number."""
+    serialized = serialize_doc(user)
+    serialized.pop("password_hash", None)
+    return serialized
+
+def get_farmer_profile(identifier: str) -> Optional[Dict[str, Any]]:
+    """Retrieve farmer profile by username or mobile number."""
     db_mgr = MongoManager()
     if not db_mgr.is_connected:
         raise RuntimeError("MongoDB connection unavailable")
 
-    doc = db_mgr.db[COLL_FARMERS].find_one({"phone": str(phone).strip()})
-    return serialize_doc(doc)
+    ident = str(identifier).strip().lower()
+    doc = db_mgr.db[COLL_FARMERS].find_one({
+        "$or": [
+            {"username": ident},
+            {"phone": ident}
+        ]
+    })
+    if doc:
+        serialized = serialize_doc(doc)
+        serialized.pop("password_hash", None)
+        return serialized
+    return None
 
 
 # ===================================================================

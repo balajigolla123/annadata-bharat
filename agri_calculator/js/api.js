@@ -110,34 +110,102 @@ const AgriAPI = {
   // FEATURE 3: FARMER PROFILE (Registration & Login)
   // ===================================================================
 
-  async registerFarmer(name, phone, pincode) {
+  async registerFarmer(param1, param2, param3, param4, param5) {
+    let payload = {};
+    if (typeof param1 === "object" && param1 !== null) {
+      payload = param1;
+    } else {
+      payload = {
+        name: param1,
+        username: param2,
+        phone: param3,
+        password: param4,
+        pincode: param5
+      };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/farmer/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, pincode })
+        body: JSON.stringify(payload)
       });
-      if (response.ok) return await response.json();
+      const data = await response.json();
+      if (response.ok && data.success) {
+        // Cache user in localStorage
+        try {
+          const users = JSON.parse(localStorage.getItem("agriRegisteredUsers") || "[]");
+          const idx = users.findIndex(u => u.username === payload.username);
+          if (idx >= 0) users[idx] = { ...users[idx], ...payload, ...data.user };
+          else users.push({ ...payload, ...data.user });
+          localStorage.setItem("agriRegisteredUsers", JSON.stringify(users));
+        } catch (e) {}
+        return data;
+      }
+      return data;
     } catch (err) {
       console.warn("registerFarmer remote error, caching locally:", err.message);
     }
     // Local fallback
-    const user = { name, phone, pincode, registered_at: new Date().toISOString() };
-    return { success: true, user, local_cache: true };
+    const localUser = {
+      id: `usr_${Date.now()}`,
+      name: payload.name || payload.username,
+      username: (payload.username || payload.phone || "farmer").toLowerCase().trim(),
+      phone: payload.phone || "",
+      password: payload.password || "123456",
+      pincode: payload.pincode || "",
+      registered_at: new Date().toISOString()
+    };
+    try {
+      const users = JSON.parse(localStorage.getItem("agriRegisteredUsers") || "[]");
+      users.push(localUser);
+      localStorage.setItem("agriRegisteredUsers", JSON.stringify(users));
+    } catch (e) {}
+    return { success: true, user: localUser, local_cache: true };
   },
 
-  async loginFarmer(phone) {
+  async loginFarmer(usernameOrPhone, password) {
+    const payload = {
+      username: (usernameOrPhone || "").trim(),
+      password: (password || "").trim()
+    };
+
     try {
       const response = await fetch(`${API_BASE_URL}/farmer/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone })
+        body: JSON.stringify(payload)
       });
-      if (response.ok) return await response.json();
+      const data = await response.json();
+      if (data && (data.success || data.error)) {
+        return data;
+      }
     } catch (err) {
-      console.warn("loginFarmer remote error:", err.message);
+      console.warn("loginFarmer remote error, checking local cache:", err.message);
     }
-    return { success: false, error: "Farmer not registered" };
+
+    // Local fallback verification
+    try {
+      const users = JSON.parse(localStorage.getItem("agriRegisteredUsers") || "[]");
+      const target = (usernameOrPhone || "").toLowerCase().trim();
+      const user = users.find(u => (u.username && u.username.toLowerCase() === target) || (u.phone && u.phone === target));
+      if (!user) {
+        return {
+          success: false,
+          not_found: true,
+          error: `User '${usernameOrPhone}' does not exist. Please create an account / sign in first.`
+        };
+      }
+      if (user.password && password && user.password !== password) {
+        return {
+          success: false,
+          error: "Incorrect password. Please try again."
+        };
+      }
+      return { success: true, user: user, local_cache: true };
+    } catch (e) {
+      return { success: false, error: "Unable to verify user" };
+    }
   },
 
   async getFarmerProfile(phone) {

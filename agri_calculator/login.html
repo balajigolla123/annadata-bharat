@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,102 +11,132 @@
       background: linear-gradient(120deg, #e8f5e9 0%, #fffde7 100%);
       min-height: 100vh;
       font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 10px;
     }
     .login-container {
-      max-width: 400px;
-      margin: 40px auto;
+      width: 100%;
+      max-width: 440px;
+      margin: 20px auto;
       background: #fff;
       border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
-      padding: 32px 28px 24px 28px;
+      box-shadow: 0 8px 30px rgba(44, 62, 80, 0.12);
+      padding: 32px 28px;
+    }
+    .app-logo {
+      height: 60px;
+      width: auto;
+      display: block;
+      margin: 0 auto 12px auto;
     }
     .login-title {
       text-align: center;
-      font-size: 2rem;
-      color: #388e3c;
-      margin-bottom: 8px;
+      font-size: 1.8rem;
+      color: #2e7d32;
+      margin-bottom: 4px;
       font-weight: 700;
     }
     .login-subtitle {
       text-align: center;
       color: #666;
-      font-size: 1rem;
-      margin-bottom: 24px;
+      font-size: 0.95rem;
+      margin-bottom: 22px;
     }
-    .form-section {
-      margin-bottom: 18px;
+    .form-card {
+      background: #f9fbe7;
+      border: 1px solid #dcedc8;
+      border-radius: 12px;
+      padding: 22px 20px;
+      margin-top: 10px;
+    }
+    .form-header-title {
+      color: #2e7d32;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     .form-group {
       margin-bottom: 16px;
     }
-    label {
-      font-weight: 500;
+    .form-group label {
+      font-weight: 600;
       color: #333;
       display: block;
       margin-bottom: 6px;
+      font-size: 0.92rem;
     }
-    input[type="text"], input[type="tel"], input[type="password"], input[type="number"] {
+    .form-group input {
       width: 100%;
-      padding: 10px;
-      border-radius: 6px;
+      padding: 11px 13px;
+      border-radius: 8px;
       border: 1px solid #cfd8dc;
       font-size: 1rem;
-      background: #f9fbe7;
-      transition: border-color 0.2s;
+      background: #fff;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus {
+    .form-group input:focus {
       border-color: #388e3c;
+      box-shadow: 0 0 0 3px rgba(56, 142, 60, 0.15);
       outline: none;
     }
     .login-btn {
       width: 100%;
-      padding: 12px;
-      background: #388e3c;
+      padding: 13px;
+      background: #2e7d32;
       color: #fff;
       border: none;
-      border-radius: 6px;
-      font-size: 1.1rem;
-      font-weight: 600;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
       cursor: pointer;
       margin-top: 8px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
     }
     .login-btn:hover {
-      background: #2e7d32;
+      background: #1b5e20;
     }
-    .btn-secondary {
-      background: #cfd8dc;
-      color: #333;
-      margin-top: 0;
+    .login-btn:active {
+      transform: scale(0.99);
     }
     .switch-link {
-      color: #388e3c;
+      color: #2e7d32;
+      font-weight: 600;
       text-decoration: underline;
       cursor: pointer;
-      font-size: 0.98rem;
     }
-    .otp-info {
+    .switch-link:hover {
+      color: #1b5e20;
+    }
+    .switch-container {
       text-align: center;
-      color: #388e3c;
-      margin-bottom: 10px;
+      margin-top: 16px;
+      font-size: 0.92rem;
+      color: #555;
     }
     .language-select {
-      float: right;
-      margin-bottom: 18px;
+      display: block;
+      margin: 0 auto 16px auto;
       border-radius: 6px;
       padding: 6px 12px;
       border: 1px solid #cfd8dc;
-      background: #f9fbe7;
-      font-size: 1rem;
+      background: #fff;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body class="login-body">
   
   <div class="login-container">
-    <div style="text-align:center;margin-bottom:10px;">
-      <img src="assets/logo.png" alt="Annadata Bharat logo" class="app-logo" style="margin:0 auto;">
-    </div>
+    <img src="assets/logo.png" alt="Annadata Bharat logo" class="app-logo">
+    
     <select id="languageSelect" class="language-select" aria-label="Select language">
       <option value="en">English</option>
       <option value="hi">Hindi</option>
@@ -122,113 +151,77 @@
       <option value="or">Odia</option>
       <option value="pa">Punjabi</option>
     </select>
+
     <h1 class="login-title" data-i18n="main_title">🌾 Agriculture Calculator</h1>
     <p class="login-subtitle" data-i18n="main_subtitle">Smart Fertilizer & Irrigation Recommendation System</p>
-    <div class="login-horizontal-forms">
-      <!-- Create Account Form -->
-      <div id="loginForm" class="form-section">
-        <form id="authForm" onsubmit="handlePhoneSubmit(event)">
-          <div class="form-group">
-            <span data-i18n="label_full_name" style="color:#388e3c;font-weight:600;display:block;margin-bottom:2px;">Full Name</span>
-            <label for="userName" data-i18n="label_full_name" style="display:none;">Full Name <span style="color:red">*</span></label>
-            <input type="text" id="userName" data-i18n-placeholder="placeholder_full_name" placeholder="Enter your full name" required>
-          </div>
-          <div class="form-group">
-            <span data-i18n="label_mobile" style="color:#388e3c;font-weight:600;display:block;margin-bottom:2px;">Mobile Number</span>
-            <label for="userPhone" data-i18n="label_mobile" style="display:none;">Mobile Number <span style="color:red">*</span></label>
-            <div class="phone-input-group" style="display:flex;align-items:center;gap:6px;">
-              <span class="country-code">+91</span>
-              <input type="tel" id="userPhone" data-i18n-placeholder="placeholder_mobile" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <span data-i18n="label_pincode" style="color:#388e3c;font-weight:600;display:block;margin-bottom:2px;">Pincode</span>
-            <label for="userPincode" data-i18n="label_pincode" style="display:none;">Pincode <span style="color:red">*</span></label>
-            <input type="text" id="userPincode" data-i18n-placeholder="placeholder_pincode" placeholder="6-digit pincode" maxlength="6" pattern="[0-9]{6}" required>
-          </div>
-          <button type="submit" class="login-btn" data-i18n="login_send_otp">Send OTP</button>
-        </form>
-        <div style="text-align:center;margin-top:10px;">
-          <span class="switch-link" onclick="showSignInForm(event)">
-            <span data-i18n="login_already_text">Already have an account?</span>
-            &nbsp;
-            <span data-i18n="login_signin">Sign In</span>
-          </span>
+
+    <!-- 1. LOGIN FORM (Default) -->
+    <div id="loginFormCard" class="form-card">
+      <div class="form-header-title">🔑 Farmer Login</div>
+      <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+        <div class="form-group">
+          <label for="loginUsername">Username or Mobile Number <span style="color:red">*</span></label>
+          <input type="text" id="loginUsername" placeholder="e.g. balaji or 9876543210" required autocomplete="username">
         </div>
-      </div>
-      <!-- Sign In Form -->
-      <div id="signInForm" class="form-section" style="display:none;">
-        <form id="signInAuthForm" onsubmit="handleSignInPhoneSubmit(event)">
-          <div class="form-group">
-            <label for="signInPhone" data-i18n="label_mobile">Mobile Number <span style="color:red">*</span></label>
-            <div class="phone-input-group" style="display:flex;align-items:center;gap:6px;">
-              <span class="country-code">+91</span>
-              <input type="tel" id="signInPhone" data-i18n-placeholder="placeholder_mobile" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}" required>
-            </div>
-          </div>
-          <button type="submit" class="login-btn" data-i18n="login_send_otp">Send OTP</button>
-        </form>
-        <div style="text-align:center;margin-top:10px;">
-          <span class="switch-link" onclick="showCreateAccountForm(event)">New user? Create Account</span>
+        <div class="form-group">
+          <label for="loginPassword">Password <span style="color:red">*</span></label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
         </div>
+        <button type="submit" class="login-btn">Log In</button>
+      </form>
+      <div class="switch-container">
+        <span>Don't have an account?</span>
+        &nbsp;
+        <span class="switch-link" onclick="showSignUpForm()">Sign Up / Create Account</span>
       </div>
-      <!-- OTP Verification Form -->
-      <div id="otpForm" class="form-section" style="display:none;">
-        <div class="otp-info">An OTP has been sent to <strong id="displayPhone"></strong></div>
-        <form id="otpVerificationForm" onsubmit="handleOtpVerify(event)">
-          <div class="form-group">
-            <label for="otpInput">Enter 6-Digit OTP <span style="color:red">*</span></label>
-            <input type="text" id="otpInput" placeholder="000000" maxlength="6" pattern="[0-9]{6}" required>
-          </div>
-          <button type="submit" class="login-btn" data-i18n="login_verify_otp">Verify OTP</button>
-          <button type="button" class="login-btn btn-secondary" data-i18n="login_back" onclick="handleBackToForm()">Back</button>
-        </form>
+    </div>
+
+    <!-- 2. SIGN UP / CREATE ACCOUNT FORM -->
+    <div id="signUpFormCard" class="form-card" style="display:none;">
+      <div class="form-header-title">🌱 Create Farmer Account</div>
+      <form id="signUpForm" onsubmit="handleSignUpSubmit(event)">
+        <div class="form-group">
+          <label for="regName">Full Name <span style="color:red">*</span></label>
+          <input type="text" id="regName" placeholder="Enter your full name" required>
+        </div>
+        <div class="form-group">
+          <label for="regUsername">Username <span style="color:red">*</span></label>
+          <input type="text" id="regUsername" placeholder="Choose a unique username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="regPhone">Mobile Number (10 Digits)</label>
+          <input type="tel" id="regPhone" placeholder="e.g. 9876543210" maxlength="10" pattern="[0-9]{10}">
+        </div>
+        <div class="form-group">
+          <label for="regPincode">Pincode (Optional)</label>
+          <input type="text" id="regPincode" placeholder="e.g. 500081" maxlength="6">
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Create Password <span style="color:red">*</span></label>
+          <input type="password" id="regPassword" placeholder="Min 4 characters" required minlength="4" autocomplete="new-password">
+        </div>
+        <button type="submit" class="login-btn">Create Account & Sign In</button>
+      </form>
+      <div class="switch-container">
+        <span>Already have an account?</span>
+        &nbsp;
+        <span class="switch-link" onclick="showLoginForm()">Log In here</span>
       </div>
     </div>
   </div>
-    <style>
-      .login-horizontal-forms {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 32px;
-        margin-top: 18px;
-      }
-      .login-horizontal-forms .form-section {
-        min-width: 320px;
-        max-width: 350px;
-        background: #f9fbe7;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(44,62,80,0.06);
-        padding: 22px 18px 18px 18px;
-        margin: 0;
-      }
-      @media (max-width: 900px) {
-        .login-horizontal-forms {
-          flex-direction: column;
-          align-items: center;
-          gap: 18px;
-        }
-      }
-    </style>
+
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
   <script src="js/login.js"></script>
   <script>
     // Persist language selection and apply translation
     const langSelect = document.getElementById('languageSelect');
-    // Set from localStorage if available
     const savedLang = localStorage.getItem('selectedLanguage');
     if (savedLang) langSelect.value = savedLang;
     langSelect.addEventListener('change', function() {
       localStorage.setItem('selectedLanguage', langSelect.value);
       if (window.i18n) window.i18n.set(langSelect.value);
     });
-    // On load, apply translation
-    if (window.i18n && langSelect.value) window.i18n.set(langSelect.value);
   </script>
 </body>
 </html>
-
-

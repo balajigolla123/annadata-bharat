@@ -106,21 +106,30 @@ def get_available_models():
 @app.route("/api/farmer/register", methods=["POST"])
 def api_register_farmer():
     """
-    Store a farmer's profile in MongoDB via PyMongo on registration.
+    Store a farmer's profile in MongoDB via PyMongo on registration with username & password.
     """
     data = request.get_json() or {}
+    username = data.get("username", "").strip()
+    password = data.get("password", "").strip()
     name = data.get("name", "").strip()
     phone = data.get("phone", "").strip()
     pincode = data.get("pincode", "").strip()
 
-    if not name or not phone or not pincode:
-        return jsonify({"success": False, "error": "Name, phone, and pincode are required"}), 400
-
-    if len(phone) != 10 or not phone.isdigit():
-        return jsonify({"success": False, "error": "Phone number must be a 10-digit number"}), 400
+    if not username and not phone:
+        return jsonify({"success": False, "error": "Username or mobile number is required"}), 400
+    if not password:
+        return jsonify({"success": False, "error": "Password is required"}), 400
 
     try:
-        res = register_farmer(name, phone, pincode)
+        res = register_farmer(
+            name=name or username,
+            phone=phone,
+            pincode=pincode,
+            username=username,
+            password=password
+        )
+        if not res.get("success"):
+            return jsonify(res), 400
         return jsonify(res)
     except Exception as e:
         logger.error("Error registering farmer: %s", e)
@@ -129,18 +138,27 @@ def api_register_farmer():
 @app.route("/api/farmer/login", methods=["POST"])
 def api_login_farmer():
     """
-    Authenticate farmer and update last_login timestamp in MongoDB.
+    Authenticate farmer with username and password in MongoDB via PyMongo.
     """
     data = request.get_json() or {}
-    phone = data.get("phone", "").strip()
+    username = (data.get("username") or data.get("phone") or "").strip()
+    password = data.get("password", "").strip()
 
-    if not phone:
-        return jsonify({"success": False, "error": "Phone number is required"}), 400
+    if not username:
+        return jsonify({"success": False, "error": "Username or mobile number is required"}), 400
+    if not password:
+        return jsonify({"success": False, "error": "Password is required"}), 400
 
     try:
-        user = login_farmer(phone)
+        user = login_farmer(username, password)
         if not user:
-            return jsonify({"success": False, "error": "Farmer not registered. Please create an account."}), 404
+            return jsonify({
+                "success": False,
+                "not_found": True,
+                "error": f"User '{username}' does not exist. Please create an account / sign in first."
+            }), 404
+        if isinstance(user, dict) and user.get("_error"):
+            return jsonify({"success": False, "error": user["_error"]}), 401
         return jsonify({"success": True, "user": user})
     except Exception as e:
         logger.error("Error logging in farmer: %s", e)
@@ -148,13 +166,13 @@ def api_login_farmer():
 
 @app.route("/api/farmer/profile", methods=["GET"])
 def api_get_farmer_profile():
-    """Retrieve farmer profile from MongoDB."""
-    phone = request.args.get("phone", "").strip()
-    if not phone:
-        return jsonify({"success": False, "error": "Phone parameter required"}), 400
+    """Retrieve farmer profile from MongoDB by username or mobile number."""
+    identifier = (request.args.get("username") or request.args.get("phone") or "").strip()
+    if not identifier:
+        return jsonify({"success": False, "error": "Username or phone parameter required"}), 400
 
     try:
-        user = get_farmer_profile(phone)
+        user = get_farmer_profile(identifier)
         if not user:
             return jsonify({"success": False, "error": "Farmer not found"}), 404
         return jsonify({"success": True, "profile": user})
