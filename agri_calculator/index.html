@@ -203,6 +203,9 @@
   </div>
 
   <button onclick="calculate()" data-i18n="calculate">Calculate Recommendation</button>
+  <div style="text-align:center;margin-top:10px;">
+    <a href="history.html" style="color:#2e7d32;font-weight:600;text-decoration:none;font-size:0.95rem;">📜 View Previous Recommendations (History) →</a>
+  </div>
 
   <div id="result" class="result"></div>
 
@@ -253,21 +256,21 @@
     }
   });
 
-  // When submitting, use custom crop name if 'Other' is selected
-  function getSelectedCrop() {
-    if (cropSelect.value === 'other' && cropSearch.value.trim()) {
-      return cropSearch.value.trim();
+  // Keep cropSearch and cropSelect synchronized
+  cropSearch.addEventListener('change', function() {
+    const val = cropSearch.value.toLowerCase().trim();
+    let found = false;
+    for (let opt of cropSelect.options) {
+      if (opt.value && (opt.value.toLowerCase() === val || opt.textContent.toLowerCase() === val)) {
+        cropSelect.value = opt.value;
+        found = true;
+        break;
+      }
     }
-    return cropSelect.value;
-  }
-
-  // Patch the global calculate() to use getSelectedCrop()
-  window._originalCalculate = window.calculate;
-  window.calculate = function() {
-    const crop = getSelectedCrop().toLowerCase();
-    // ...existing code...
-    window._originalCalculate.call(this);
-  };
+    if (!found && val) {
+      cropSelect.value = 'other';
+    }
+  });
 </script>
 <script>
   // Persist language selection and apply translation

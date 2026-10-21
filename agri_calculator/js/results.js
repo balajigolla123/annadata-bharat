@@ -295,7 +295,18 @@ function renderResults(langFromEvent) {
   `;
 
 
-  const mlPred = data.mlPrediction || null;
+  let mlPred = data.mlPrediction || null;
+  if (!mlPred && window.calculateClientRFPrediction) {
+    mlPred = window.calculateClientRFPrediction({
+      crop: crop,
+      area: area,
+      soil_type: data.soilType || "alluvial",
+      soil_texture: data.soilTexture || "loamy",
+      n: data.soilTestN,
+      p: data.soilTestP,
+      k: data.soilTestK
+    });
+  }
   let mlHTML = "";
   if (mlPred) {
     const fallbackBadge = mlPred.fallback_used

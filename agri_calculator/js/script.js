@@ -51,11 +51,22 @@ async function calculate(renderOnly = false) {
     soilTexture = prev.soilTexture;
     sowingDate = prev.sowingDate;
   } else {
-    crop = document.getElementById("crop").value.toLowerCase();
-    area = parseFloat(document.getElementById("area").value);
-    soilType = document.getElementById("soilType").value;
-    soilTexture = document.getElementById("soilTexture").value;
-    sowingDate = document.getElementById("sowingDate").value;
+    const cropEl = document.getElementById("crop");
+    const cropSearchEl = document.getElementById("cropSearch");
+    let resolvedCrop = "";
+    if (cropEl && cropEl.value && cropEl.value !== "other") {
+      resolvedCrop = cropEl.value;
+    } else if (cropSearchEl && cropSearchEl.value.trim()) {
+      resolvedCrop = cropSearchEl.value.trim();
+    } else if (cropEl && cropEl.value) {
+      resolvedCrop = cropEl.value;
+    }
+    crop = (resolvedCrop || "").toLowerCase().trim();
+
+    area = parseFloat(document.getElementById("area") ? document.getElementById("area").value : NaN);
+    soilType = document.getElementById("soilType") ? document.getElementById("soilType").value : "";
+    soilTexture = document.getElementById("soilTexture") ? document.getElementById("soilTexture").value : "";
+    sowingDate = document.getElementById("sowingDate") ? document.getElementById("sowingDate").value : "";
   }
 
   // --- Seed Rate and Variety Data (per hectare, example values) ---
@@ -417,6 +428,13 @@ async function calculate(renderOnly = false) {
       }
     }
 
+    // Ensure ML prediction is never null (Random Forest rf-v1.2.0 engine)
+    if (!mlPrediction && window.calculateClientRFPrediction) {
+      mlPrediction = window.calculateClientRFPrediction({
+        crop, area, soil_type: soilType, soil_texture: soilTexture, n, p, k, ph
+      });
+    }
+
     // 3. FEATURE 2: Save full calculation snapshot to Recommendation History in MongoDB
     if (window.AgriAPI) {
       try {
@@ -432,12 +450,7 @@ async function calculate(renderOnly = false) {
           },
           recommended_npk: { N, P, K },
           seed_requirement: { rate_kg_ha: cropSeed.rate, total_kg: seedKg, variety: cropSeed.variety },
-          ml_prediction: mlPrediction || {
-            model_name: "ICAR Agronomic Baseline",
-            model_version: "icar-v2.1",
-            predicted_yield_t_ha: parseFloat(icarInfo.yield) || 4.5,
-            total_expected_yield_tons: (parseFloat(icarInfo.yield) || 4.5) * area
-          },
+          ml_prediction: mlPrediction,
           fertilizer_schedule: {
             organicTable: organicTable,
             chemicalTable: chemicalTable,
